@@ -1,11 +1,10 @@
-name: Build Python EXE with Nuitka
+name: Auto Build Python EXE
 
-# Workflow tetikleme
 on:
   push:
     branches:
-      - main        # main branch’e push olunca otomatik çalışır
-  workflow_dispatch: # manuel tetikleme de mümkün
+      - main   # main branch’e push olunca otomatik çalışır
+  workflow_dispatch: # manuel tetikleme için opsiyonel
 
 jobs:
   build-exe:
@@ -13,12 +12,10 @@ jobs:
 
     steps:
       # 1️⃣ Repo’yu çek
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       # 2️⃣ Python kur
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
@@ -34,6 +31,9 @@ jobs:
         run: |
           nuitka --onefile main.py
 
-      # 5️⃣ Artifact olarak yükle
+      # 5️⃣ Artifact olarak upload et
       - name: Upload EXE
         uses: actions/upload-artifact@v4
+        with:
+          name: MyPythonApp.exe
+          path: main.exe
