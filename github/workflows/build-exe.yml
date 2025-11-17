@@ -1,0 +1,40 @@
+name: Build Python EXE with Nuitka
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-exe:
+    runs-on: windows-latest
+
+    steps:
+      # 1️⃣ Repo’yu çek
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ Python kur
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # 3️⃣ Nuitka ve dependencies yükle
+      - name: Install Nuitka
+        run: |
+          python -m pip install --upgrade pip
+          pip install nuitka
+
+      # 4️⃣ EXE build et
+      - name: Build EXE
+        run: |
+          nuitka --onefile main.py
+
+      # 5️⃣ Artifact olarak yükle
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyPythonApp.exe
+          path: main.exe
