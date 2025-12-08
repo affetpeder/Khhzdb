@@ -1,4 +1,4 @@
-name: Build Kivy APK
+name: Build Kivy APK with Docker
 
 on:
   push:
@@ -14,46 +14,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-
-    - name: Install system dependencies
+    - name: Build APK inside Docker
       run: |
-        sudo apt update
-        sudo apt install -y python3-dev python3-pip git zip unzip openjdk-11-jdk build-essential \
-        autoconf automake libtool pkg-config zlib1g-dev libffi-dev libssl-dev libsqlite3-dev wget
-
-    - name: Install Android SDK dependencies
-      run: |
-        mkdir -p $HOME/.buildozer/android
-        cd $HOME/.buildozer/android
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-        mkdir temp
-        unzip cmdline-tools.zip -d temp
-        rm cmdline-tools.zip
-        mkdir -p cmdline-tools/latest
-        mv temp/cmdline-tools/* cmdline-tools/latest/
-        rm -rf temp
-
-        export ANDROID_HOME=$HOME/.buildozer/android
-        export ANDROID_SDK_ROOT=$HOME/.buildozer/android
-        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
-
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-33" "build-tools;33.0.2"
-
-    - name: Install Buildozer and Cython
-      run: |
-        pip install --upgrade pip wheel setuptools
-        pip install cython==0.29.36 buildozer==1.5.0
-
-    - name: Build Android APK
-      run: |
-        export ANDROID_HOME=$HOME/.buildozer/android
-        export ANDROID_SDK_ROOT=$HOME/.buildozer/android
-        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
-        buildozer android debug
+        docker run --rm -v ${{ github.workspace }}:/home/user/hostcwd kivy/buildozer \
+        bash -c "cd /home/user/hostcwd && buildozer android debug"
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
