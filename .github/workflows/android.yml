@@ -45,6 +45,9 @@ jobs:
 
     - name: Build Android APK
       run: |
+        export ANDROID_HOME=$HOME/.buildozer/android
+        export ANDROID_SDK_ROOT=$HOME/.buildozer/android
+        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
         buildozer android debug
 
     - name: Upload APK Artifact
