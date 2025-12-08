@@ -27,8 +27,8 @@ jobs:
 
     - name: Install Android SDK dependencies
       run: |
-        mkdir -p ~/.buildozer/android
-        cd ~/.buildozer/android
+        mkdir -p $HOME/.buildozer/android
+        cd $HOME/.buildozer/android
         wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
         mkdir temp
         unzip cmdline-tools.zip -d temp
@@ -36,7 +36,12 @@ jobs:
         mkdir -p cmdline-tools/latest
         mv temp/cmdline-tools/* cmdline-tools/latest/
         rm -rf temp
-        yes | ~/.buildozer/android/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+
+        export ANDROID_HOME=$HOME/.buildozer/android
+        export ANDROID_SDK_ROOT=$HOME/.buildozer/android
+        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
     - name: Install Buildozer and Cython
       run: |
